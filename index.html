@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AkwaabaBaby - Created by Kwaku Ofori Appiah</title>
+<style>
+body{margin:0;font-family:-apple-system;background:#fdf8f3}
+.header{text-align:center;padding:24px 20px}
+.header h2{margin:0;font-size:32px} .header h2 span{color:#ff8fa0}
+.credit{font-size:13px;color:#555;margin-top:6px} .credit b{color:#111}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;max-width:600px;margin:auto}
+.card{border-radius:18px;aspect-ratio:3/4;background:#fff;border:3px solid transparent;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.06)}
+.card.active{border-color:#ff8fa0} .card canvas{width:100%;height:100%}
+#editor{position:fixed;inset:0;background:#000;z-index:99;display:none;flex-direction:column}
+#editor.show{display:flex} .top{display:flex;justify-content:space-between;color:#fff;padding:14px}
+.canvasArea{flex:1;display:flex;justify-content:center;align-items:center;background:#111;position:relative}
+#c{max-height:70vh;max-width:92vw} 
+.lockscreen{position:absolute;top:8%;left:0;right:0;text-align:center;color:#fff;text-shadow:0 2px 10px #000}
+.lockscreen .time{font-size:68px;font-weight:800}
+.panel{background:#fff;border-radius:22px 22px 0 0;padding:16px}
+.btn{width:100%;padding:14px;border-radius:30px;border:none;font-weight:700;margin-top:8px}
+.black{background:#000;color:#fff} .light{background:#eee}
+footer{text-align:center;padding:24px;color:#999;font-size:12px} footer b{color:#333}
+</style>
+</head>
+<body>
+<div class="header">
+<h2>Akwaaba<span>Baby</span> 👶</h2>
+<h1>the cutest monthlies are now on your lockscreen</h1>
+<div class="credit">Created by <b>Kwaku Ofori Appiah</b></div>
+<input id="babyName" placeholder="Baby Name e.g. Jacob" style="margin-top:12px;padding:12px;border-radius:12px;border:1px solid #ddd;width:80%">
+</div>
+<div class="grid" id="grid"></div>
+<footer>© 2026 AkwaabaBaby • Created by <b>Kwaku Ofori Appiah</b></footer>
+
+<div id="editor">
+<div class="top"><span onclick="closeEditor()">✕</span><span id="status">Upload baby</span><span>AkwaabaBaby</span></div>
+<div class="canvasArea">
+<canvas id="c" width="1080" height="1920"></canvas>
+<div class="lockscreen"><div>Fri Jun 5</div><div class="time">9:15</div></div>
+</div>
+<div class="panel">
+<input type="file" id="up" accept="image/*" hidden>
+<label for="up" class="btn light" style="display:block;text-align:center">📷 Upload Baby Photo</label>
+Size<input id="size" type="range" min="0.3" max="2" step="0.05" value="1" style="width:100%">
+Move<input id="yPos" type="range" min="-600" max="600" step="10" value="0" style="width:100%">
+<button class="btn black" id="dl">Download Wallpaper - AkwaabaBaby</button>
+<p style="text-align:center;font-size:11px;color:#888">Created by Kwaku Ofori Appiah</p>
+</div>
+</div>
+
+<script type="module">
+import {removeBackground} from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/index.js";
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+let sel=0,baby=null;
+const templates=[
+ {name:'Blue Balloon 1 Month',draw:(ctx,w,h,baby,s,y,name)=>{
+   ctx.fillStyle='#fdf6ef';ctx.fillRect(0,0,w,h);
+   ctx.fillStyle='white';ctx.fillRect(0,h*0.6,w,h*0.4);
+   ctx.fillStyle='#bde0fe';ctx.beginPath();ctx.ellipse(w*0.75,h*0.45,w*0.15,h*0.3,0,0,7);ctx.fill();
+   ctx.fillStyle='white';ctx.font='bold 220px sans-serif';ctx.fillText('1',w*0.68,h*0.54);
+   ctx.fillStyle='#8B7355';ctx.font='12px sans-serif';ctx.fillText('🐰 Bunny + 1 month blocks',w*0.05,h*0.85);
+   if(baby)ctx.drawImage(baby,w*0.22,h*0.55+y,w*0.5*s,w*0.4*s);
+ }},
+ {name:'Ladder Cloud 12',draw:(ctx,w,h,baby,s,y)=>{
+   ctx.fillStyle='#d6eeff';ctx.fillRect(0,0,w,h);
+   ctx.fillStyle='white';ctx.fillRect(w*0.35,h*0.2,w*0.3,h*0.6);
+   ctx.fillStyle='#1a2a4a';ctx.font='bold 180px sans-serif';ctx.fillText('2',w*0.6,h*0.3);ctx.fillText('1',w*0.2,h*0.85);
+   if(baby)ctx.drawImage(baby,w*0.3,h*0.4+y,w*0.4*s,w*0.32*s);
+ }},
+ {name:'Cow Moon 1 month',draw:(ctx,w,h,baby,s,y)=>{
+   ctx.fillStyle='#0a1931';ctx.fillRect(0,0,w,h);
+   ctx.fillStyle='#ffde7d';ctx.beginPath();ctx.arc(w*0.5,h*0.65,w*0.2,0,7);ctx.fill();
+   ctx.fillStyle='#ffde7d';ctx.font='30px sans-serif';ctx.fillText('1 month',w*0.35,h*0.9);
+   if(baby)ctx.drawImage(baby,w*0.32,h*0.35+y,w*0.36*s,w*0.28*s);
+ }},
+ {name:'Planets + Name 2 Months',draw:(ctx,w,h,baby,s,y,name)=>{
+   ctx.fillStyle='#fffaf0';ctx.fillRect(0,0,w,h);
+   ctx.fillStyle='#2a7fff';ctx.beginPath();ctx.arc(w*0.7,h*0.4,w*0.15,0,7);ctx.fill();
+   ctx.fillStyle='white';ctx.beginPath();ctx.arc(w*0.85,h*0.5,w*0.12,0,7);ctx.fill();
+   ctx.fillStyle='#b68c3a';ctx.font='italic 40px serif';
+   if(name)ctx.fillText(name+' is 2 months old',w*0.55,h*0.55);
+   else ctx.fillText('Jacob is 2 months old',w*0.55,h*0.55);
+   if(baby)ctx.drawImage(baby,w*0.2,h*0.6+y,w*0.5*s,w*0.38*s);
+ }}
+];
+const grid=document.getElementById('grid');
+templates.forEach((t,i)=>{
+ const d=document.createElement('div');d.className='card'+(i==0?' active':'');
+ const cv=document.createElement('canvas');cv.width=300;cv.height=400;
+ t.draw(cv.getContext('2d'),300,400,null,1,0,'Jacob');
+ d.appendChild(cv);d.onclick=()=>{sel=i;document.querySelectorAll('.card').forEach(x=>x.classList.remove('active'));d.classList.add('active');openEditor();};
+ grid.appendChild(d);
+});
+function openEditor(){document.getElementById('editor').classList.add('show');draw();}
+window.closeEditor=()=>document.getElementById('editor').classList.remove('show');
+function draw(){
+ const name=document.getElementById('babyName').value;
+ const s=parseFloat(document.getElementById('size').value);
+ const y=parseInt(document.getElementById('yPos').value);
+ ctx.clearRect(0,0,1080,1920);
+ templates[sel].draw(ctx,1080,1920,baby,s,y,name);
+ ctx.fillStyle='rgba(0,0,0,0.4)';ctx.font='12px sans-serif';
+ ctx.fillText('AkwaabaBaby | Created by Kwaku Ofori Appiah',20,1900);
+}
+document.getElementById('size').addEventListener('input',draw);
+document.getElementById('yPos').addEventListener('input',draw);
+document.getElementById('babyName').addEventListener('input',draw);
+document.getElementById('up').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ document.getElementById('status').innerText='Removing background...';
+ try{
+  const blob=await removeBackground(file);
+  const url=URL.createObjectURL(blob);
+  baby=new Image();baby.src=url;baby.onload=()=>{draw();document.getElementById('status').innerText='Done!';};
+ }catch{baby=new Image();baby.src=URL.createObjectURL(file);baby.onload=draw;}
+});
+document.getElementById('dl').onclick=()=>{
+ const a=document.createElement('a');a.download='AkwaabaBaby-'+templates[sel].name+'.jpg';
+ a.href=c.toDataURL('image/jpeg',0.92);a.click();
+};
+</script>
+</body>
+</html>
